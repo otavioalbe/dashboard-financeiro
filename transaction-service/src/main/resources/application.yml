@@ -6,7 +6,7 @@ spring:
     name: transaction-service
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/transaction_db
+    url: jdbc:postgresql://localhost:5434/transaction_db
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver

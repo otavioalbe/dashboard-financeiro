@@ -6,14 +6,14 @@ spring:
     name: account-service
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/account_db
+    url: jdbc:postgresql://localhost:5433/account_db
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
-      ddl-auto: update   # depois mudar para validate em produção
+      ddl-auto: update   # depois mudar para validate em produï¿½ï¿½o
     show-sql: true
     properties:
       hibernate:

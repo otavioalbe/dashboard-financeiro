@@ -1,4 +1,5 @@
 services:
+
   postgres-auth:
     image: postgres:15
     container_name: postgres-auth
@@ -8,3 +9,31 @@ services:
       POSTGRES_PASSWORD: postgres
     ports:
       - "5432:5432"
+
+  postgres-account:
+    image: postgres:15
+    container_name: postgres-account
+    environment:
+      POSTGRES_DB: account_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+
+  postgres-transaction:
+    image: postgres:15
+    container_name: postgres-transaction
+    environment:
+      POSTGRES_DB: transaction_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5434:5432"
+
+  mongodb-analytics:
+    image: mongo:7
+    container_name: mongodb-analytics
+    environment:
+      MONGO_INITDB_DATABASE: analytics_db
+    ports:
+      - "27017:27017"
