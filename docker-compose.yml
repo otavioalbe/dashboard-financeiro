@@ -35,5 +35,7 @@ services:
     container_name: mongodb-analytics
     environment:
       MONGO_INITDB_DATABASE: analytics_db
+      MONGO_INITDB_ROOT_USERNAME: mongo
+      MONGO_INITDB_ROOT_PASSWORD: mongo
     ports:
       - "27017:27017"
