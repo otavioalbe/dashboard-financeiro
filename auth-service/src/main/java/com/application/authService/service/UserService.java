@@ -13,9 +13,13 @@ public class UserService {
 
     @Autowired
     private UserRespository userRepository;
+    @Autowired
     private UserMapper userMapper;
 
-    public ResponseEntity<UserRecord> createUser(UserRecord dto) {
+    public ResponseEntity<?> createUser(UserRecord dto) {
+        if (userRepository.existsById(dto.username())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already exists");
+        }
         var response = userRepository.save(userMapper.fromRequestToEntity(dto));
         return ResponseEntity.status(HttpStatus.CREATED).body(userMapper.fromEntityToResponse(response));
     }

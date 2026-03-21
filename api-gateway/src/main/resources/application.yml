@@ -7,27 +7,28 @@ spring:
 
   cloud:
     gateway:
-      mvc:
-        routes:
-          - id: auth-service
-            uri: http://localhost:8081
-            predicates:
-              - Path=/api/auth/**
+      server:
+        webmvc:
+          routes:
+            - id: auth-service
+              uri: http://localhost:8081
+              predicates:
+                - Path=/api/auth/**
 
-          - id: account-service
-            uri: http://localhost:8082
-            predicates:
-              - Path=/api/accounts/**
+            - id: account-service
+              uri: http://localhost:8082
+              predicates:
+                - Path=/api/accounts/**
 
-          - id: transaction-service
-            uri: http://localhost:8083
-            predicates:
-              - Path=/api/transactions/**
+            - id: transaction-service
+              uri: http://localhost:8083
+              predicates:
+                - Path=/api/transactions/**
 
-          - id: analytics-service
-            uri: http://localhost:8084
-            predicates:
-              - Path=/api/analytics/**
+            - id: analytics-service
+              uri: http://localhost:8084
+              predicates:
+                - Path=/api/analytics/**
 
 management:
   endpoints:
