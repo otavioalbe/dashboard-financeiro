@@ -20,4 +20,9 @@ public class UserController {
     public ResponseEntity<?> createUser(@RequestBody UserRecord dto) {
         return userService.createUser(dto);
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody UserRecord dto) {
+        return userService.login(dto);
+    }
 }

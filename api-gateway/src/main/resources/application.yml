@@ -30,6 +30,9 @@ spring:
               predicates:
                 - Path=/api/analytics/**
 
+jwt:
+  secret: dashboard-financeiro-secret-key-256bits!!
+
 management:
   endpoints:
     web:
