@@ -13,6 +13,6 @@ public class User {
     @Id
     @Column(nullable = false, unique = true)
     private String username;
-    @Column
+    @Column(nullable = false)
     private String password;
 }

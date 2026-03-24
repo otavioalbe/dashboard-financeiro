@@ -4,6 +4,10 @@ server:
 spring:
   application:
     name: account-service
+  config:
+    import:
+      - optional:file:.env[.properties]
+      - optional:file:../.env[.properties]
 
   datasource:
     url: jdbc:postgresql://localhost:5433/account_db
