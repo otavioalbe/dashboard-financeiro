@@ -31,7 +31,7 @@ spring:
                 - Path=/api/analytics/**
 
 jwt:
-  secret: dashboard-financeiro-secret-key-256bits!!
+  secret: ${JWT_SECRET}
 
 management:
   endpoints:

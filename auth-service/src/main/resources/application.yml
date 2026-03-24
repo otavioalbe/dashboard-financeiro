@@ -19,4 +19,4 @@ spring:
         format_sql: true
 
 jwt:
-  secret: dashboard-financeiro-secret-key-256bits!!
+  secret: ${JWT_SECRET}
