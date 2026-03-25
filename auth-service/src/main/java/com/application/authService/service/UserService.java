@@ -3,27 +3,26 @@ package com.application.authService.service;
 import com.application.authService.dto.UserRecord;
 import com.application.authService.entity.User;
 import com.application.authService.mapper.UserMapper;
-import com.application.authService.repository.UserRespository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.application.authService.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
-    @Autowired
-    private UserRespository userRepository;
-    @Autowired
-    private UserMapper userMapper;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-    @Autowired
-    private JwtService jwtService;
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
+    @Transactional
     public ResponseEntity<?> createUser(UserRecord dto) {
         if (userRepository.existsById(dto.username())) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already exists");
@@ -36,6 +35,7 @@ public class UserService {
         return ResponseEntity.status(HttpStatus.CREATED).body(userMapper.fromEntityToResponse(response));
     }
 
+    @Transactional(readOnly = true)
     public ResponseEntity<?> login(UserRecord dto) {
         return userRepository.findById(dto.username())
                 .filter(user -> passwordEncoder.matches(dto.password(), user.getPassword()))
