@@ -2,7 +2,6 @@ package com.application.authService.service;
 
 import com.application.authService.dto.UserRecord;
 import com.application.authService.entity.User;
-import com.application.authService.mapper.UserMapper;
 import com.application.authService.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,21 +17,20 @@ import java.util.Map;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
     @Transactional
     public ResponseEntity<?> createUser(UserRecord dto) {
         if (userRepository.existsById(dto.username())) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already exists");
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
         User user = User.builder()
                 .username(dto.username())
                 .password(passwordEncoder.encode(dto.password()))
                 .build();
         var response = userRepository.save(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(userMapper.fromEntityToResponse(response));
+        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("username", response.getUsername()));
     }
 
     @Transactional(readOnly = true)

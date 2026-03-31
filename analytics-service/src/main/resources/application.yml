@@ -13,7 +13,10 @@ spring:
     serialization:
       indent_output: true
   mongodb:
-    uri: mongodb://mongo:mongo@localhost:27017/analytics_db?authSource=admin
+    uri: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@localhost:27017/analytics_db?authSource=admin
+
+jwt:
+  secret: ${JWT_SECRET}
 
 management:
   endpoints:

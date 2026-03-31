@@ -5,6 +5,7 @@ import com.application.authService.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,12 +20,12 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> createUser(@RequestBody UserRecord dto) {
+    public ResponseEntity<?> createUser(@Valid @RequestBody UserRecord dto) {
         return userService.createUser(dto);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody UserRecord dto) {
+    public ResponseEntity<?> login(@Valid @RequestBody UserRecord dto) {
         return userService.login(dto);
     }
 }

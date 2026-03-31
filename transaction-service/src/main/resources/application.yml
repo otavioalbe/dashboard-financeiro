@@ -11,21 +11,24 @@ spring:
 
   datasource:
     url: jdbc:postgresql://localhost:5434/transaction_db
-    username: postgres
-    password: postgres
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
       ddl-auto: update   # depois: validate
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
-        format_sql: true
+        format_sql: false
 
   jackson:
     serialization:
       indent_output: true
+
+jwt:
+  secret: ${JWT_SECRET}
 
 management:
   endpoints:
@@ -35,5 +38,5 @@ management:
 
 logging:
   level:
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.hibernate.SQL: WARN
+    org.hibernate.type.descriptor.sql.BasicBinder: WARN

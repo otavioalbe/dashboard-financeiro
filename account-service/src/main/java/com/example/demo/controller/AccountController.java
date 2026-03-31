@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,26 +23,30 @@ public class AccountController {
     private final AccountService accountService;
 
     @GetMapping
-    public ResponseEntity<List<AccountResponse>> listAccounts(
-            @RequestHeader("X-User-Id") String userId) {
-        return ResponseEntity.ok(accountService.listAccounts(userId));
+    public ResponseEntity<List<AccountResponse>> listAccounts(Authentication authentication) {
+        return ResponseEntity.ok(accountService.listAccounts(authentication.getName()));
     }
 
     @PostMapping("/create-account")
     public ResponseEntity<AccountResponse> createAccount(
-            @RequestHeader("X-User-Id") String userId,
+            Authentication authentication,
             @Valid @RequestBody CreateAccountRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(accountService.createAccount(userId, request));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(accountService.createAccount(authentication.getName(), request));
     }
 
     @GetMapping("/{accountNumber}")
-    public ResponseEntity<AccountResponse> getAccount(@PathVariable String accountNumber) {
-        return ResponseEntity.ok(accountService.getAccount(accountNumber));
+    public ResponseEntity<AccountResponse> getAccount(
+            Authentication authentication,
+            @PathVariable String accountNumber) {
+        return ResponseEntity.ok(accountService.getAccount(authentication.getName(), accountNumber));
     }
 
     @DeleteMapping("/{accountNumber}")
-    public ResponseEntity<Void> deleteAccount(@PathVariable String accountNumber) {
-        accountService.deleteAccount(accountNumber);
+    public ResponseEntity<Void> deleteAccount(
+            Authentication authentication,
+            @PathVariable String accountNumber) {
+        accountService.deleteAccount(authentication.getName(), accountNumber);
         return ResponseEntity.noContent().build();
     }
 
