@@ -6,11 +6,12 @@ import com.example.demo.entity.Account;
 import com.example.demo.mapper.AccountMapper;
 import com.example.demo.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
 import java.security.SecureRandom;
 import java.util.List;
 
@@ -43,9 +44,9 @@ public class AccountService {
     @Transactional(readOnly = true)
     public AccountResponse getAccount(String userId, String accountNumber) {
         Account account = accountRepository.findById(accountNumber)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatusCode.valueOf(404), "Account not found"));
         if (!account.getUserId().equals(userId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
+            throw new ResponseStatusException(HttpStatusCode.valueOf(403), "Access denied");
         }
         return accountMapper.toResponse(account);
     }
@@ -53,11 +54,37 @@ public class AccountService {
     @Transactional
     public void deleteAccount(String userId, String accountNumber) {
         Account account = accountRepository.findById(accountNumber)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatusCode.valueOf(404), "Account not found"));
         if (!account.getUserId().equals(userId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
+            throw new ResponseStatusException(HttpStatusCode.valueOf(403), "Access denied");
         }
         accountRepository.deleteById(accountNumber);
+    }
+
+    @Transactional(readOnly = true)
+    public AccountResponse getAccountInternal(String accountNumber) {
+        Account account = accountRepository.findById(accountNumber)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatusCode.valueOf(404), "Account not found"));
+        return accountMapper.toResponse(account);
+    }
+
+    @Transactional
+    public AccountResponse credit(String accountNumber, BigDecimal amount) {
+        Account account = accountRepository.findByIdWithLock(accountNumber)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatusCode.valueOf(404), "Account not found"));
+        account.setBalance(account.getBalance().add(amount));
+        return accountMapper.toResponse(accountRepository.save(account));
+    }
+
+    @Transactional
+    public AccountResponse debit(String accountNumber, BigDecimal amount) {
+        Account account = accountRepository.findByIdWithLock(accountNumber)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatusCode.valueOf(404), "Account not found"));
+        if (account.getBalance().compareTo(amount) < 0) {
+            throw new ResponseStatusException(HttpStatusCode.valueOf(422), "Insufficient balance");
+        }
+        account.setBalance(account.getBalance().subtract(amount));
+        return accountMapper.toResponse(accountRepository.save(account));
     }
 
     private String generateAccountNumber() {

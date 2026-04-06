@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.AccountResponse;
+import com.example.demo.dto.BalanceRequest;
 import com.example.demo.dto.CreateAccountRequest;
 import com.example.demo.service.AccountService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -48,6 +49,30 @@ public class AccountController {
             @PathVariable String accountNumber) {
         accountService.deleteAccount(authentication.getName(), accountNumber);
         return ResponseEntity.noContent().build();
+    }
+
+    // --- Internal endpoints (transaction-service only, protected by X-Internal-Key) ---
+
+    @GetMapping("/internal/{accountNumber}")
+    @Operation(summary = "Internal: get account info for service-to-service calls")
+    public ResponseEntity<AccountResponse> getAccountInternal(@PathVariable String accountNumber) {
+        return ResponseEntity.ok(accountService.getAccountInternal(accountNumber));
+    }
+
+    @PostMapping("/internal/{accountNumber}/credit")
+    @Operation(summary = "Internal: credit amount to account balance")
+    public ResponseEntity<AccountResponse> creditInternal(
+            @PathVariable String accountNumber,
+            @Valid @RequestBody BalanceRequest request) {
+        return ResponseEntity.ok(accountService.credit(accountNumber, request.amount()));
+    }
+
+    @PostMapping("/internal/{accountNumber}/debit")
+    @Operation(summary = "Internal: debit amount from account balance")
+    public ResponseEntity<AccountResponse> debitInternal(
+            @PathVariable String accountNumber,
+            @Valid @RequestBody BalanceRequest request) {
+        return ResponseEntity.ok(accountService.debit(accountNumber, request.amount()));
     }
 
 }
