@@ -3,7 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.dto.AccountResponse;
 import com.example.demo.dto.BalanceRequest;
 import com.example.demo.dto.CreateAccountRequest;
-import com.example.demo.service.AccountService;
+import com.example.demo.service.IAccountService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -21,7 +21,7 @@ import java.util.List;
 @Tag(name = "Accounts", description = "Account management endpoints")
 public class AccountController {
 
-    private final AccountService accountService;
+    private final IAccountService accountService;
 
     @GetMapping
     public ResponseEntity<List<AccountResponse>> listAccounts(Authentication authentication) {

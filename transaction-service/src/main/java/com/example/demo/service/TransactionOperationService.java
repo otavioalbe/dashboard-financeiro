@@ -7,20 +7,22 @@ import com.example.demo.dto.TransactionResponse;
 import com.example.demo.entity.Transaction;
 import com.example.demo.entity.TransactionType;
 import com.example.demo.event.TransactionCreatedEvent;
+import com.example.demo.exception.AccountAccessDeniedException;
+import com.example.demo.exception.InsufficientBalanceException;
+import com.example.demo.exception.InvalidTransferException;
+import com.example.demo.exception.TransactionNotFoundException;
 import com.example.demo.mapper.TransactionMapper;
 import com.example.demo.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class TransactionOperationService {
+public class TransactionOperationService implements ITransactionOperationService {
 
     private static final String TRANSACTIONS_TOPIC = "transactions";
 
@@ -40,7 +42,7 @@ public class TransactionOperationService {
 
         if (req.type() == TransactionType.DEBIT || req.type() == TransactionType.TRANSFER) {
             if (source.balance().compareTo(req.amount()) < 0) {
-                throw new ResponseStatusException(HttpStatusCode.valueOf(422), "Insufficient balance");
+                throw new InsufficientBalanceException();
             }
         }
 
@@ -92,25 +94,25 @@ public class TransactionOperationService {
     @Transactional(readOnly = true)
     public TransactionResponse getById(String userId, String transactionId) {
         Transaction transaction = transactionRepository.findById(transactionId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatusCode.valueOf(404), "Transaction not found"));
+                .orElseThrow(() -> new TransactionNotFoundException(transactionId));
         if (!transaction.getUserId().equals(userId)) {
-            throw new ResponseStatusException(HttpStatusCode.valueOf(403), "Access denied");
+            throw new AccountAccessDeniedException();
         }
         return transactionMapper.toResponse(transaction);
     }
 
     private void validateOwnership(AccountInfo account, String userId) {
         if (!account.userId().equals(userId)) {
-            throw new ResponseStatusException(HttpStatusCode.valueOf(403), "Account does not belong to this user");
+            throw new AccountAccessDeniedException();
         }
     }
 
     private void validateTransfer(CreateTransactionRequest req, String userId) {
         if (req.targetAccountNumber() == null || req.targetAccountNumber().isBlank()) {
-            throw new ResponseStatusException(HttpStatusCode.valueOf(400), "targetAccountNumber is required for TRANSFER");
+            throw new InvalidTransferException("targetAccountNumber is required for TRANSFER");
         }
         if (req.accountNumber().equals(req.targetAccountNumber())) {
-            throw new ResponseStatusException(HttpStatusCode.valueOf(400), "Source and target accounts must be different");
+            throw new InvalidTransferException("Source and target accounts must be different");
         }
         AccountInfo target = accountClient.getAccount(req.targetAccountNumber());
         validateOwnership(target, userId);

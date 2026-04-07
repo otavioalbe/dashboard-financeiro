@@ -2,7 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.CreateTransactionRequest;
 import com.example.demo.dto.TransactionResponse;
-import com.example.demo.service.TransactionOperationService;
+import com.example.demo.service.ITransactionOperationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -20,7 +20,7 @@ import java.util.List;
 @Tag(name = "Transactions", description = "Transaction management endpoints")
 public class TransactionController {
 
-    private final TransactionOperationService transactionService;
+    private final ITransactionOperationService transactionService;
 
     @PostMapping
     @Operation(summary = "Create a transaction (CREDIT, DEBIT or TRANSFER)")
