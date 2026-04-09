@@ -95,7 +95,7 @@ class TransactionOperationServiceTest {
         TransactionResponse result = transactionOperationService.create("otavio", req);
 
         assertThat(result.type()).isEqualTo(TransactionType.CREDIT);
-        verify(accountClient).credit(eq("0123456789"), eq(new BigDecimal("5000.00")));
+        verify(accountClient).credit(eq("otavio"), eq("0123456789"), eq(new BigDecimal("5000.00")));
         verify(kafkaTemplate).send(eq("transactions"), any(), any());
     }
 
@@ -115,7 +115,7 @@ class TransactionOperationServiceTest {
 
         transactionOperationService.create("otavio", req);
 
-        verify(accountClient).debit(eq("0123456789"), eq(new BigDecimal("50.00")));
+        verify(accountClient).debit(eq("otavio"), eq("0123456789"), eq(new BigDecimal("50.00")));
     }
 
     @Test
@@ -131,7 +131,7 @@ class TransactionOperationServiceTest {
         assertThatThrownBy(() -> transactionOperationService.create("otavio", req))
                 .isInstanceOf(InsufficientBalanceException.class);
 
-        verify(accountClient, never()).debit(any(), any());
+        verify(accountClient, never()).debit(any(), any(), any());
         verify(transactionRepository, never()).save(any());
     }
 
@@ -153,8 +153,8 @@ class TransactionOperationServiceTest {
 
         transactionOperationService.create("otavio", req);
 
-        verify(accountClient).debit(eq("0123456789"), eq(new BigDecimal("200.00")));
-        verify(accountClient).credit(eq("9876543210"), eq(new BigDecimal("200.00")));
+        verify(accountClient).debit(eq("otavio"), eq("0123456789"), eq(new BigDecimal("200.00")));
+        verify(accountClient).credit(eq("otavio"), eq("9876543210"), eq(new BigDecimal("200.00")));
     }
 
     @Test

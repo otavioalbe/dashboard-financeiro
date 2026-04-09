@@ -164,7 +164,7 @@ class AccountServiceTest {
         when(accountRepository.save(account)).thenReturn(account);
         when(accountMapper.toResponse(account)).thenReturn(accountResponse);
 
-        accountService.credit("0123456789", new BigDecimal("500.00"));
+        accountService.credit("otavio", "0123456789", new BigDecimal("500.00"));
 
         assertThat(account.getBalance()).isEqualByComparingTo("1500.00");
         verify(accountRepository).save(account);
@@ -175,7 +175,7 @@ class AccountServiceTest {
     void credit_notFound() {
         when(accountRepository.findByIdWithLock("0000000000")).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> accountService.credit("0000000000", new BigDecimal("100.00")))
+        assertThatThrownBy(() -> accountService.credit("otavio", "0000000000", new BigDecimal("100.00")))
                 .isInstanceOf(AccountNotFoundException.class);
     }
 
@@ -188,7 +188,7 @@ class AccountServiceTest {
         when(accountRepository.save(account)).thenReturn(account);
         when(accountMapper.toResponse(account)).thenReturn(accountResponse);
 
-        accountService.debit("0123456789", new BigDecimal("300.00"));
+        accountService.debit("otavio", "0123456789", new BigDecimal("300.00"));
 
         assertThat(account.getBalance()).isEqualByComparingTo("700.00");
         verify(accountRepository).save(account);
@@ -199,7 +199,7 @@ class AccountServiceTest {
     void debit_insufficientBalance() {
         when(accountRepository.findByIdWithLock("0123456789")).thenReturn(Optional.of(account));
 
-        assertThatThrownBy(() -> accountService.debit("0123456789", new BigDecimal("9999.00")))
+        assertThatThrownBy(() -> accountService.debit("otavio", "0123456789", new BigDecimal("9999.00")))
                 .isInstanceOf(InsufficientBalanceException.class);
 
         verify(accountRepository, never()).save(any());
