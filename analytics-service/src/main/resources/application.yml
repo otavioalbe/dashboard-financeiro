@@ -15,6 +15,18 @@ spring:
   mongodb:
     uri: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@localhost:27017/analytics_db?authSource=admin
 
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: analytics-service
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "com.example.demo.event"
+        spring.json.value.default.type: "com.example.demo.event.TransactionCreatedEvent"
+        spring.json.use.type.headers: "false"
+
 jwt:
   secret: ${JWT_SECRET}
 
