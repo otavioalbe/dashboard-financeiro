@@ -12,6 +12,6 @@ public interface IAccountService {
     AccountResponse getAccount(String userId, String accountNumber);
     void deleteAccount(String userId, String accountNumber);
     AccountResponse getAccountInternal(String accountNumber);
-    AccountResponse credit(String accountNumber, BigDecimal amount);
-    AccountResponse debit(String accountNumber, BigDecimal amount);
+    AccountResponse credit(String userId, String accountNumber, BigDecimal amount);
+    AccountResponse debit(String userId, String accountNumber, BigDecimal amount);
 }

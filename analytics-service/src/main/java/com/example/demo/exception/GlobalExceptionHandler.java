@@ -19,7 +19,7 @@ public class GlobalExceptionHandler {
                 .body(new ErrorResponse(
                         HttpStatus.INTERNAL_SERVER_ERROR.value(),
                         "Internal Server Error",
-                        ex.getMessage(),
+                        "An unexpected error occurred",
                         LocalDateTime.now()
                 ));
     }

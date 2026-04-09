@@ -64,7 +64,7 @@ public class AccountController {
     public ResponseEntity<AccountResponse> creditInternal(
             @PathVariable String accountNumber,
             @Valid @RequestBody BalanceRequest request) {
-        return ResponseEntity.ok(accountService.credit(accountNumber, request.amount()));
+        return ResponseEntity.ok(accountService.credit(request.userId(), accountNumber, request.amount()));
     }
 
     @PostMapping("/internal/{accountNumber}/debit")
@@ -72,7 +72,7 @@ public class AccountController {
     public ResponseEntity<AccountResponse> debitInternal(
             @PathVariable String accountNumber,
             @Valid @RequestBody BalanceRequest request) {
-        return ResponseEntity.ok(accountService.debit(accountNumber, request.amount()));
+        return ResponseEntity.ok(accountService.debit(request.userId(), accountNumber, request.amount()));
     }
 
 }

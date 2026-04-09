@@ -34,20 +34,20 @@ public class AccountClient {
         }
     }
 
-    public void credit(String accountNumber, BigDecimal amount) {
+    public void credit(String userId, String accountNumber, BigDecimal amount) {
         restClient.post()
                 .uri("/api/accounts/internal/{number}/credit", accountNumber)
                 .header("X-Internal-Key", internalApiKey)
-                .body(Map.of("amount", amount))
+                .body(Map.of("amount", amount, "userId", userId))
                 .retrieve()
                 .toBodilessEntity();
     }
 
-    public void debit(String accountNumber, BigDecimal amount) {
+    public void debit(String userId, String accountNumber, BigDecimal amount) {
         restClient.post()
                 .uri("/api/accounts/internal/{number}/debit", accountNumber)
                 .header("X-Internal-Key", internalApiKey)
-                .body(Map.of("amount", amount))
+                .body(Map.of("amount", amount, "userId", userId))
                 .retrieve()
                 .toBodilessEntity();
     }

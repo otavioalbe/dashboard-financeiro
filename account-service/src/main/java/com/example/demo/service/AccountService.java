@@ -61,17 +61,19 @@ public class AccountService implements IAccountService {
     }
 
     @Transactional
-    public AccountResponse credit(String accountNumber, BigDecimal amount) {
+    public AccountResponse credit(String userId, String accountNumber, BigDecimal amount) {
         Account account = accountRepository.findByIdWithLock(accountNumber)
                 .orElseThrow(() -> new AccountNotFoundException(accountNumber));
+        validateOwnership(account, userId);
         account.setBalance(account.getBalance().add(amount));
         return accountMapper.toResponse(accountRepository.save(account));
     }
 
     @Transactional
-    public AccountResponse debit(String accountNumber, BigDecimal amount) {
+    public AccountResponse debit(String userId, String accountNumber, BigDecimal amount) {
         Account account = accountRepository.findByIdWithLock(accountNumber)
                 .orElseThrow(() -> new AccountNotFoundException(accountNumber));
+        validateOwnership(account, userId);
         if (account.getBalance().compareTo(amount) < 0) {
             throw new InsufficientBalanceException();
         }

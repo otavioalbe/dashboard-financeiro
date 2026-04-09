@@ -46,7 +46,7 @@ public class TransactionOperationService implements ITransactionOperationService
             }
         }
 
-        applyBalanceChanges(req);
+        applyBalanceChanges(userId, req);
 
         Transaction transaction = transactionRepository.save(Transaction.builder()
                 .userId(userId)
@@ -118,13 +118,13 @@ public class TransactionOperationService implements ITransactionOperationService
         validateOwnership(target, userId);
     }
 
-    private void applyBalanceChanges(CreateTransactionRequest req) {
+    private void applyBalanceChanges(String userId, CreateTransactionRequest req) {
         switch (req.type()) {
-            case CREDIT -> accountClient.credit(req.accountNumber(), req.amount());
-            case DEBIT -> accountClient.debit(req.accountNumber(), req.amount());
+            case CREDIT -> accountClient.credit(userId, req.accountNumber(), req.amount());
+            case DEBIT -> accountClient.debit(userId, req.accountNumber(), req.amount());
             case TRANSFER -> {
-                accountClient.debit(req.accountNumber(), req.amount());
-                accountClient.credit(req.targetAccountNumber(), req.amount());
+                accountClient.debit(userId, req.accountNumber(), req.amount());
+                accountClient.credit(userId, req.targetAccountNumber(), req.amount());
             }
         }
     }
