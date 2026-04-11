@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: analytics-service
+  namespace: financial-dashboard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: analytics-service
+  template:
+    metadata:
+      labels:
+        app: analytics-service
+    spec:
+      containers:
+        - name: analytics-service
+          image: analytics-service:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8084
+          env:
+            - name: MONGO_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: MONGO_USERNAME
+            - name: MONGO_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: MONGO_PASSWORD
+            - name: MONGO_HOST
+              value: mongodb-analytics
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: JWT_SECRET
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: kafka:9092
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8084
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 10
+          resources:
+            requests:
+              memory: 256Mi
+              cpu: 250m
+            limits:
+              memory: 768Mi
+              cpu: 750m
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: analytics-service
+  namespace: financial-dashboard
+spec:
+  selector:
+    app: analytics-service
+  ports:
+    - port: 8084
+      targetPort: 8084

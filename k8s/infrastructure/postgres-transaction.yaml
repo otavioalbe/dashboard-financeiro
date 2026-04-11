@@ -1,0 +1,75 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-transaction-pvc
+  namespace: financial-dashboard
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-transaction
+  namespace: financial-dashboard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-transaction
+  template:
+    metadata:
+      labels:
+        app: postgres-transaction
+    spec:
+      containers:
+        - name: postgres-transaction
+          image: postgres:15
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: transaction_db
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: DB_USERNAME
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: DB_PASSWORD
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: data
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "postgres", "-d", "transaction_db"]
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          resources:
+            requests:
+              memory: 128Mi
+              cpu: 100m
+            limits:
+              memory: 512Mi
+              cpu: 500m
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: postgres-transaction-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-transaction
+  namespace: financial-dashboard
+spec:
+  selector:
+    app: postgres-transaction
+  ports:
+    - port: 5432
+      targetPort: 5432

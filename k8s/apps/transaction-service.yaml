@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: transaction-service
+  namespace: financial-dashboard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: transaction-service
+  template:
+    metadata:
+      labels:
+        app: transaction-service
+    spec:
+      containers:
+        - name: transaction-service
+          image: transaction-service:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8083
+          env:
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: DB_USERNAME
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: DB_PASSWORD
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: JWT_SECRET
+            - name: INTERNAL_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: INTERNAL_API_KEY
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://postgres-transaction:5432/transaction_db
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: kafka:9092
+            - name: SERVICES_ACCOUNT_URL
+              value: http://account-service:8082
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8083
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 10
+          resources:
+            requests:
+              memory: 256Mi
+              cpu: 250m
+            limits:
+              memory: 768Mi
+              cpu: 750m
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: transaction-service
+  namespace: financial-dashboard
+spec:
+  selector:
+    app: transaction-service
+  ports:
+    - port: 8083
+      targetPort: 8083
