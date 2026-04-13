@@ -192,7 +192,7 @@ Campos do evento: `transactionId`, `userId`, `accountNumber`, `targetAccountNumb
 
 ### Cloud
 
-- Oracle Cloud Infrastructure — Free Tier (VM.Standard.A1.Flex, 4 OCPU, 24 GB RAM)
+- AWS EC2 — Free Tier (Ubuntu, Elastic IP fixo: 52.3.119.116)
 
 ### Testes
 
@@ -258,6 +258,23 @@ minikube start
 # Obter a URL do gateway
 minikube service api-gateway -n financial-dashboard --url
 ```
+
+---
+
+## CI/CD
+
+O deploy em producao e automatizado via **GitHub Actions**.
+
+- Push na branch `main` dispara o workflow `.github/workflows/deploy.yml`
+- O workflow acessa a EC2 via SSH e executa `git pull` + `docker compose up -d --build`
+- Os containers sobem automaticamente ao ligar a instancia (systemd service)
+
+**Branches:**
+
+| Branch    | Finalidade                        |
+|-----------|-----------------------------------|
+| `develop` | Desenvolvimento e testes          |
+| `main`    | Producao — trigger do deploy auto |
 
 ---
 
