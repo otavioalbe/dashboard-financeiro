@@ -1,5 +1,14 @@
 # Financial Dashboard
 
+![Java](https://img.shields.io/badge/Java-21-orange)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.0-green)
+![Kafka](https://img.shields.io/badge/Apache_Kafka-4.1-black)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue)
+![MongoDB](https://img.shields.io/badge/MongoDB-7-darkgreen)
+![Docker](https://img.shields.io/badge/Docker-enabled-blue)
+![AWS EC2](https://img.shields.io/badge/AWS-EC2-orange)
+![Build](https://img.shields.io/github/actions/workflow/status/otavioalbe/dashboard-financeiro/deploy.yml?label=CI/CD)
+
 ## Visão Geral
 
 Sistema financeiro distribuído desenvolvido com foco em boas práticas de engenharia de software, arquitetura de microserviços e arquitetura orientada a eventos.
@@ -12,6 +21,8 @@ Projeto desenvolvido para fins de estudo avançado e portfólio profissional, de
 
 ## Arquitetura
 
+![Diagrama de Arquitetura](./docs/architecture.svg)
+
 O sistema é composto por cinco microserviços independentes, comunicando-se via HTTP (REST) e eventos assíncronos (Kafka).
 
 ```
@@ -23,12 +34,11 @@ O sistema é composto por cinco microserviços independentes, comunicando-se via
     +---> auth-service        :8081  (PostgreSQL)
     +---> account-service     :8082  (PostgreSQL)
     +---> transaction-service :8083  (PostgreSQL)
-                  |
-                  v
-              [Kafka - topico: transactions]
-                  |
-                  v
-          analytics-service   :8084  (MongoDB)
+    |                 |
+    |                 v
+    |         [Kafka - topico: transactions]
+    |                 |
+    +---> analytics-service   :8084  (MongoDB)
 ```
 
 ### Caracteristicas principais
@@ -66,6 +76,8 @@ Responsavel pelo gerenciamento de contas financeiras.
 
 Banco: PostgreSQL (`account_db`, porta 5433)
 
+![Criacao de conta](./docs/create-account.png)
+
 ---
 
 ### transaction-service
@@ -91,6 +103,8 @@ Responsavel pelo processamento e agregacao de dados financeiros.
 - Fornece endpoints de consulta para dashboards
 
 Banco: MongoDB (`analytics_db`, porta 27017)
+
+![Analytics](./docs/analytics.png)
 
 ---
 
@@ -212,6 +226,14 @@ Campos do evento: `transactionId`, `userId`, `accountNumber`, `targetAccountNumb
 | transaction-service | TransactionOperationServiceTest  | 13         |
 | analytics-service   | AnalyticsQueryServiceTest        | 6          |
 | analytics-service   | TransactionEventConsumerTest     | 2          |
+
+---
+
+## Testando a API
+
+Importe a collection do Postman disponível em [`/docs/postman_collection.json`](./docs/postman_collection.json)
+
+A collection cobre todos os endpoints: autenticação, contas, transações e analytics, com exemplos de requisição para cada operação.
 
 ---
 
